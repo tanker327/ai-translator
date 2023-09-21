@@ -7,4 +7,8 @@ AI-Translator with GUI
 1. Update your OpenAI key in config.yaml
 1. Run `python main.py` to start the app.
 
-Enjoy!s
+Enjoy!
+
+
+# What is cool
+The GUI is generated using chatGPT 4. [Here is the conversations](https://chat.openai.com/share/e5852d3e-78ea-4981-95d5-8b0852c3efbb).
