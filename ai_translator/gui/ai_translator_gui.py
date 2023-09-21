@@ -55,7 +55,7 @@ class FormatNotifier:
     def check_format(self):
         selected_format = self.combobox.get()
         if selected_format == "PDF":
-            messagebox.showinfo("提示", "你好")
+            messagebox.showinfo("提示", "PDF是Pro版本的功能，欢迎付费升级成Pro版本，尽享无尽PDF乐趣")
             self.combobox.set("Markdown")
 
 class AITranslatorGUI(tk.Tk):
