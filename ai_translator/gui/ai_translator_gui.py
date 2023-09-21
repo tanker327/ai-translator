@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog, ttk, messagebox
+from translator import PDFTranslator
 from pdf2image import convert_from_path
 from PIL import Image, ImageTk
 
@@ -47,10 +48,6 @@ class PDFRenderer:
         
         return width, height
 
-class Translator:
-    def get_translation(self):
-        return "这是示例文本，显示在Markdown窗口中。"
-
 class FormatNotifier:
     def __init__(self, combobox):
         self.combobox = combobox
@@ -61,11 +58,14 @@ class FormatNotifier:
             messagebox.showinfo("提示", "你好")
             self.combobox.set("Markdown")
 
-class PDFMarkdownApp(tk.Tk):
-    def __init__(self):
+class AITranslatorGUI(tk.Tk):
+    def __init__(self, model):
         super().__init__()
+        
+        
         self.title("PDF and Markdown Viewer")
-        self.translator = Translator()
+        self.translator = PDFTranslator(model)
+        self.language = "中文"
 
         # Top Panel
         self.top_frame = ttk.Frame(self)
@@ -83,9 +83,10 @@ class PDFMarkdownApp(tk.Tk):
         self.next_page_btn = ttk.Button(self.top_frame, text="下一页", command=self.next_page)
         self.next_page_btn.pack(side=tk.LEFT, padx=5)
 
-        self.language_combobox = ttk.Combobox(self.top_frame, values=["英文", "日文"], state='readonly')
-        self.language_combobox.set("英文")
+        self.language_combobox = ttk.Combobox(self.top_frame, values=["中文", "日文","法文"], state='readonly')
+        self.language_combobox.set("中文")
         self.language_combobox.pack(side=tk.LEFT, padx=10)
+        self.language_combobox.bind("<<ComboboxSelected>>", self.on_language_change)
 
         self.format_combobox = ttk.Combobox(self.top_frame, values=["Markdown", "PDF"], state='readonly')
         self.format_combobox.set("Markdown")
@@ -117,6 +118,8 @@ class PDFMarkdownApp(tk.Tk):
         file_path = filedialog.askopenfilename(filetypes=[("PDF files", "*.pdf")])
         if not file_path:
             return
+        
+        self.file_path = file_path
 
         width, height = self.pdf_renderer.load_pdf(file_path)
         self.markdown_text.config(width=width, height=height)
@@ -141,10 +144,13 @@ class PDFMarkdownApp(tk.Tk):
             file.write(self.markdown_text.get(1.0, tk.END))
 
     def translate_text(self):
-        translated_text = self.translator.get_translation()
+        translated_text = self.translator.translate_pdf_to_string(self.file_path, "markdown",target_language = self.language)
         self.markdown_text.delete(1.0, tk.END)
         self.markdown_text.insert(tk.END, translated_text)
+        
+    def on_language_change(self, event):
+        self.language = self.language_combobox.get()
 
 if __name__ == "__main__":
-    app = PDFMarkdownApp()
+    app = AITranslatorGUI()
     app.mainloop()

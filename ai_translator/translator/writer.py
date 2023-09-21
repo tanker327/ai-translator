@@ -76,33 +76,61 @@ class Writer:
         doc.build(story)
         LOG.info(f"翻译完成: {output_file_path}")
 
-    def _save_translated_book_markdown(self, book: Book, output_file_path: str = None):
+    def generate_translated_book_markdown(self, book: Book) -> str:
+        """
+        Generate translated book content in Markdown format.
+
+        Args:
+        - book (Book): The book object containing pages and contents.
+
+        Returns:
+        - str: Translated book content in Markdown format.
+        """
+        markdown_content = []
+
+        # Iterate over the pages and contents
+        for page in book.pages:
+            for content in page.contents:
+                if content.status:
+                    if content.content_type == ContentType.TEXT:
+                        # Add translated text to the Markdown list
+                        text = content.translation
+                        markdown_content.append(text + '\n\n')
+
+                    elif content.content_type == ContentType.TABLE:
+                        # Add table to the Markdown list
+                        table = content.translation
+                        header = '| ' + ' | '.join(str(column) for column in table.columns) + ' |' + '\n'
+                        separator = '| ' + ' | '.join(['---'] * len(table.columns)) + ' |' + '\n'
+                        body = '\n'.join(['| ' + ' | '.join(str(cell) for cell in row) + ' |' for row in table.values.tolist()]) + '\n\n'
+                        markdown_content.extend([header, separator, body])
+
+            # Add a page break (horizontal rule) after each page except the last one
+            if page != book.pages[-1]:
+                markdown_content.append('---\n\n')
+
+        return ''.join(markdown_content)
+
+
+    def save_translated_book_markdown(self, book: Book, output_file_path: str = None):
+        """
+        Save the translated book content in Markdown format to a file.
+
+        Args:
+        - book (Book): The book object containing pages and contents.
+        - output_file_path (str): Path to save the output file.
+        """
         if output_file_path is None:
             output_file_path = book.pdf_file_path.replace('.pdf', f'_translated.md')
 
         LOG.info(f"pdf_file_path: {book.pdf_file_path}")
         LOG.info(f"开始翻译: {output_file_path}")
+
+        # Get the translated markdown content
+        markdown_content = self._generate_translated_book_markdown(book)
+
+        # Write the markdown content to the output file
         with open(output_file_path, 'w', encoding='utf-8') as output_file:
-            # Iterate over the pages and contents
-            for page in book.pages:
-                for content in page.contents:
-                    if content.status:
-                        if content.content_type == ContentType.TEXT:
-                            # Add translated text to the Markdown file
-                            text = content.translation
-                            output_file.write(text + '\n\n')
-
-                        elif content.content_type == ContentType.TABLE:
-                            # Add table to the Markdown file
-                            table = content.translation
-                            header = '| ' + ' | '.join(str(column) for column in table.columns) + ' |' + '\n'
-                            separator = '| ' + ' | '.join(['---'] * len(table.columns)) + ' |' + '\n'
-                            # body = '\n'.join(['| ' + ' | '.join(row) + ' |' for row in table.values.tolist()]) + '\n\n'
-                            body = '\n'.join(['| ' + ' | '.join(str(cell) for cell in row) + ' |' for row in table.values.tolist()]) + '\n\n'
-                            output_file.write(header + separator + body)
-
-                # Add a page break (horizontal rule) after each page except the last one
-                if page != book.pages[-1]:
-                    output_file.write('---\n\n')
+            output_file.write(markdown_content)
 
         LOG.info(f"翻译完成: {output_file_path}")
