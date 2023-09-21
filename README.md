@@ -9,6 +9,9 @@ AI-Translator with GUI
 
 Enjoy!
 
+# What is missing
+Due to the binary files in the `tkinterhtml` library are not compatible with the architecture of  MacOS M1 & M2. The markdown preview is not working properly. For now, only markdown content is shown in the markdown window. 
+
 
 # What is cool
 The GUI is generated using chatGPT 4. [Here is the conversations](https://chat.openai.com/share/e5852d3e-78ea-4981-95d5-8b0852c3efbb).
