@@ -5,7 +5,7 @@ AI-Translator with GUI
 # How to use 
 1. Install all the dependencies using `pip install -r requirements.txt`
 1. Update your OpenAI key in config.yaml
-1. Run `python main.py` to start the app.
+1. Run `python src/main.py` to start the app.
 
 Enjoy!
 
